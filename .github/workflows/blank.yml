@@ -1,0 +1,29 @@
+name: Test for tsubakimoto/action-dotnet-format
+
+on:
+  # pull_request:
+  #   branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  test-action-dotnet-format:
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v6
+      - name: Format
+        id: format
+        uses: tsubakimoto/action-dotnet-format@v1
+        with:
+          base-branch: '${{ github.ref_name }}'
+          project-path: 'consoleapp/consoleapp.csproj'
+          verbosity: 'diag'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Output
+        run: |
+          echo "head-branch: ${{ steps.format.outputs.head-branch }}"
+          echo "changed: ${{ steps.format.outputs.changed }}"
+          echo "pull-request-url: ${{ steps.format.outputs.pull-request-url }}"
