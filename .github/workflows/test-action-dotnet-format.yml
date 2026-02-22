@@ -20,7 +20,8 @@ jobs:
           dotnet-version: '8.0.x'
       - name: Format
         id: format
-        uses: tsubakimoto/action-dotnet-format@v1
+        # uses: tsubakimoto/action-dotnet-format@v1
+        uses: ./.github/actions/action-dotnet-format
         with:
           base-branch: '${{ github.ref_name }}'
           project-path: 'consoleapp/consoleapp.csproj'
