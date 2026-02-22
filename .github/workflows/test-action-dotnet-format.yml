@@ -7,8 +7,9 @@ on:
     inputs:
       draft:
         description: 'Create the pull request as a draft'
+        type: boolean
         required: false
-        default: 'true'
+        default: true
 
 permissions:
   contents: write
