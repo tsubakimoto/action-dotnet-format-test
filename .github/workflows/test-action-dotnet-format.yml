@@ -27,6 +27,7 @@ jobs:
           project-path: 'consoleapp/consoleapp.csproj'
           verbosity: 'diag'
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          draft: 'true'
       - name: Output
         run: |
           echo "head-branch: ${{ steps.format.outputs.head-branch }}"

@@ -10,15 +10,19 @@ inputs:
     required: true
     default: 'main'
   project-path:
-    description: 'Path to the project to format'
+    description: 'Path to the project or solution to format (e.g., src/MyApp.csproj or MyApp.sln)'
     required: true
   verbosity:
-    description: 'Verbosity of the output'
+    description: 'Verbosity of the output. One of: quiet, minimal, normal, detailed, diagnostic'
     required: false
     default: 'normal'
   github-token:
     description: 'GitHub token'
     required: true
+  draft:
+    description: 'Create the pull request as a draft'
+    required: false
+    default: 'false'
 outputs:
   head-branch:
     description: 'Head branch to compare against'
@@ -50,7 +54,8 @@ runs:
       if: steps.diff.outputs.changed == 'true'
       id: commit
       run: |
-        HEAD_BRANCH="format/${{ github.actor }}-$(date +%Y%m%d%H%M%S)"
+        ACTOR=$(echo "${{ github.actor }}" | sed 's/[^a-zA-Z0-9-]/-/g')
+        HEAD_BRANCH="format/${ACTOR}-$(date +%Y%m%d%H%M%S)"
         git checkout -b $HEAD_BRANCH
         git config user.name github-actions[bot]
         git config user.email 41898282+github-actions[bot]@users.noreply.github.com
@@ -69,11 +74,16 @@ runs:
         BASE_BRANCH=${{ inputs.base-branch }}
         HEAD_BRANCH=${{ steps.commit.outputs.head-branch-name }}
         TITLE="Auto format on $BASE_BRANCH"
+        DRAFT_FLAG=""
+        if [ "${{ inputs.draft }}" = "true" ]; then
+          DRAFT_FLAG="--draft"
+        fi
         url=$(gh pr create \
           --base $BASE_BRANCH \
           --head $HEAD_BRANCH \
           --title "$TITLE" \
-          --body "$TITLE")
+          --body "$TITLE" \
+          $DRAFT_FLAG)
         echo "Successfully created pull request: $url"
         echo "url=$url" >> $GITHUB_OUTPUT
       shell: bash
